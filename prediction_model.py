@@ -40,7 +40,7 @@ class LinearExtendedYuleProcess():
             self.X = data['X'].to_numpy()
         
         elif isintance(self.data, str) and self.data.endswith('.csv'):
-            prepare_data()
+            self.prepare_data()
         else:
             print("Data needs to be a Pandas DataFrame or a CSV file.")
 
@@ -108,9 +108,9 @@ class LinearExtendedYuleProcess():
     
     def log_likelihood(self, params):
     
-        update_parameters('alpha', np.array(params[0], dtype=np.float32))
-        update_parameters('delta', np.array(params[1], dtype=np.float32))
-        update_parameters('beta', np.array([params[2:]], dtype=np.float32))
+        self.update_parameters('alpha', np.array(params[0], dtype=np.float32))
+        self.update_parameters('delta', np.array(params[1], dtype=np.float32))
+        self.update_parameters('beta', np.array([params[2:]], dtype=np.float32))
         # self.alpha = np.array(params[0], dtype=np.float32)
         # self.delta = np.array(params[1], dtype=np.float32)
         # self.beta = np.array([params[2:]], dtype=np.float32)
@@ -121,8 +121,8 @@ class LinearExtendedYuleProcess():
         # X = data[3]
         # T = data[4]
         
-        g = g_func()
-        h = h_func()
+        g = self.g_func()
+        h = self.h_func()
 
         term_0 = self.n * np.log(self.alpha)
         term_1 = g
@@ -138,7 +138,7 @@ class LinearExtendedYuleProcess():
         nll = -(np.sum(term_0 + term_1 - term_2 + term_3 + term_4 + term_5 + term_6))
         return nll
 
-    def mu(self, t):
+    def mu(self):
         mu = np.exp(self.alpha * np.power(t, self.delta) * np.exp(self.X * self.beta))
         self.mu = mu
         return mu
@@ -149,7 +149,7 @@ class LinearExtendedYuleProcess():
         denom = mu(b) - mu(a) + 1
 
         ev = term_0 * (num / denom)
-        self.ex_value = ev
+        self.expected_value = ev
         return ev
 
     def fit_leyp(self, method='Nelder-Mead'):
